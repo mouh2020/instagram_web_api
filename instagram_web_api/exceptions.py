@@ -20,3 +20,9 @@ class IncorrectUsername(ClientError) :
 class CheckpointRequired(ClientError) : 
     "raise when login is required"
     pass
+class VideoDuration(ClientError) : 
+    "raise when video duration more than 30s or less than 3s "
+    pass
+class MediaType(ClientError) : 
+    "raise when the media type is invalid "
+    pass

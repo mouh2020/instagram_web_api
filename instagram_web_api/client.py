@@ -2,15 +2,12 @@ import requests
 from requests import Response
 import json
 from .auth import Login
-from .exceptions import(BadPassword,
-                        UnknownError,
-                        IncorrectUsername,
-                        CheckpointRequired,
-                        LoginRequired,
-                        ChallengeRequired)
-class Client (Login): 
+from .upload import Upload
+from .exceptions import *
+
+class Client (Login,Upload): 
     base_api_url  = "https://www.instagram.com/api/v1/"
-    def __init__(self,username,password,settings_path=None,proxies=None,user_agent = None,selenium_bypass=None) : 
+    def __init__(self,username,password,settings=None,proxies=None,user_agent = None,selenium_bypass=None) : 
         self.username  = username 
         self.password  = password
         self.logged_in = False
@@ -22,10 +19,8 @@ class Client (Login):
         self.session.headers = self.base_headers
         self.session.verify  = True
         self.selenium_bypass = selenium_bypass
-        if settings_path :
+        if settings :
             self.logged_in = True
-            with open(settings_path,"r") as file : 
-                settings = json.load(file)
             self.session = requests.Session()
             self.session.cookies.update(settings)
     
@@ -55,26 +50,27 @@ class Client (Login):
         elif response.status_code == 403 : 
             if response_type == "auth.login" : 
                 raise IncorrectUsername("You entred incorrect username.")
-        
-        elif response.status_code == 400 : 
-            message = json_response.get("message")
-            if message =="checkpoint_required" : 
+        message = json_response.get("message")
+        if message : 
+            if  "Media type invalid" in message : 
+                raise MediaType(message="Media type invalid")
+            elif "Sorry, your password was incorrect. Please double-check your password." == message : 
+                raise IncorrectUsername("You entred incorrect username.")
+            elif "checkpoint_required" in message  : 
                 raise CheckpointRequired("You need to login manualy or activate selenium_bypass.")
-            elif message == "login_required" : 
-                if self.selenium_bypass : 
-                    ## Resolve challenge with Selenium
-                    return True
+            elif "login_required" in message : 
                 raise LoginRequired("You need to login manualy or activate selenium_bypass.")
-            elif message == "challenge_required" : 
-                if self.selenium_bypass : 
-                    return True
+            elif "challenge_required" in message : 
                 raise ChallengeRequired("You need to resolve challenge or activate selenium_bypass.")
+
             
-    def _make_call(self,endpoint,params=None,data=None) :
+    def _make_call(self,url=None,endpoint=None,params=None,data=None) :
+        if endpoint : 
+            url = self.base_api_url+endpoint
+        
         if data : 
-            return self.session.post(self.base_api_url+endpoint,
+            return self.session.post(url,
                                      data=data,
-                                     timeout=5,
                                      allow_redirects=True)
 
 
