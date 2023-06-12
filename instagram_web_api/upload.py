@@ -3,7 +3,7 @@ from PIL import Image
 class Upload : 
     upload_id = get_id()
     def post_picture(self,file_path ,caption) : 
-        self.__build_upload_id_photo(media_path=file_path)
+        self.__build_upload_id_picture(media_path=file_path)
         self.session.headers  ['x-csrftoken'] = self.get_cookies["csrftoken"]
         self.session.headers ["Content-Type"] = "application/x-www-form-urlencoded"
         self.session.headers ["Referer"]      = "https://www.instagram.com/"
@@ -22,7 +22,7 @@ class Upload :
                                data = data)
         self._handle_response(response,response_type="upload.post_picture")
 
-    def __build_upload_id_photo(self,media_path) : 
+    def __build_upload_id_picture(self,media_path) : 
         
         img = Image.open(media_path)
         (w,h) = img.size
@@ -37,7 +37,7 @@ class Upload :
                                 }
         response = self._make_call(url  = f"https://www.instagram.com/rupload_igphoto/fb_uploader_{str(self.upload_id)}" ,
                                data = open(media_path,"rb").read() )
-        self._handle_response(response,response_type="upload.__build_upload_id_photo")
+        self._handle_response(response,response_type="upload.__build_upload_id_picture")
 
 
         
