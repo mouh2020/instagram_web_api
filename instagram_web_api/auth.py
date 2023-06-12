@@ -1,12 +1,11 @@
-from datetime import datetime
-from .utils import generate_csrf_token
+from .utils import generate_csrf_token,get_id
 class Login(object) : 
     def login(self) : 
         time = int(datetime.now().timestamp())
         if self.logged_in : 
             return
         data = {
-            "enc_password" : f'#PWD_INSTAGRAM_BROWSER:0:{time}:{self.password}' ,
+            "enc_password" : f'#PWD_INSTAGRAM_BROWSER:0:{get_id()}:{self.password}' ,
             'username': self.username,
             'queryParams': '{}',
             'optIntoOneTap': 'false',
