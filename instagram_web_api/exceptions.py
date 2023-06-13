@@ -26,3 +26,5 @@ class VideoDuration(ClientError) :
 class MediaType(ClientError) : 
     "raise when the media type is invalid "
     pass
+class UploadMedia(ClientError) : 
+    pass
