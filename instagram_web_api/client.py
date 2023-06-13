@@ -46,10 +46,7 @@ class Client (Login,Upload):
                 if json_response.get('authenticated') == False :
                     raise BadPassword("You entred incorrect password.")
             return json_response
-                
-        elif response.status_code == 403 : 
-            if response_type == "auth.login" : 
-                raise IncorrectUsername("You entred incorrect username.")
+        
         message = json_response.get("message")
         if message : 
             if  "Media type invalid" in message : 
@@ -62,16 +59,19 @@ class Client (Login,Upload):
                 raise LoginRequired("You need to login manualy or activate selenium_bypass.")
             elif "challenge_required" in message : 
                 raise ChallengeRequired("You need to resolve challenge or activate selenium_bypass.")
+            elif "Transcode not finished yet." in message : 
+                raise UploadMedia(str(message))
 
-            
-    def _make_call(self,url=None,endpoint=None,params=None,data=None) :
+    def _make_call(self,url=None,endpoint=None,params=None,data=None,response_type=None) :
         if endpoint : 
             url = self.base_api_url+endpoint
         
         if data : 
-            return self.session.post(url,
+            response =  self.session.post(url,
                                      data=data,
                                      allow_redirects=True)
+            self._handle_response(response=response,
+                                  response_type=response_type)
 
 
 
