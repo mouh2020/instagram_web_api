@@ -27,4 +27,11 @@ class MediaType(ClientError) :
     "raise when the media type is invalid "
     pass
 class UploadMedia(ClientError) : 
+    "raise when the media not properly uploaded "
+    pass
+class DeletedMedia(ClientError) : 
+    "raise when the media not found "
+    pass
+class CommentDisabled(ClientError) : 
+    "raise when the media not found "
     pass
