@@ -28,5 +28,3 @@ class MediaType(ClientError) :
     pass
 class UploadMedia(ClientError) : 
     pass
-class MediaDuration(ClientError) : 
-    pass
