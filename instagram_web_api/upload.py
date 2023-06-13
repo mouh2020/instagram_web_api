@@ -2,7 +2,7 @@ from .utils import get_id
 from PIL import Image
 from moviepy.editor import VideoFileClip
 import json,time
-from .exceptions import MediaDuration
+from .exceptions import VideoDuration
 class Upload : 
 
     def post_video(self,file_path,caption,from_picture=None) : 
@@ -56,7 +56,7 @@ class Upload :
         (width, height), duration = video.size,video.duration
         duration = 90
         if not(3 < duration < 59 ) : 
-            raise MediaDuration("The media should be between 3s and 60s")
+            raise VideoDuration("The media should be between 3s and 60s")
         thumbnail_path = f'{str(upload_id)}.jpg'
         video.save_frame(thumbnail_path,t=(duration / 2))
         response = self.__build_thumbnail(video,upload_id)
