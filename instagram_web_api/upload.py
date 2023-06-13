@@ -54,7 +54,6 @@ class Upload :
         
         video = VideoFileClip(filename=file_path)
         (width, height), duration = video.size,video.duration
-        duration = 90
         if not(3 < duration < 59 ) : 
             raise VideoDuration("The media should be between 3s and 60s")
         thumbnail_path = f'{str(upload_id)}.jpg'
