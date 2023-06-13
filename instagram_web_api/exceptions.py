@@ -35,3 +35,9 @@ class DeletedMedia(ClientError) :
 class CommentDisabled(ClientError) : 
     "raise when the media not found "
     pass
+class AccountNameLimit(ClientError): 
+    "raise when try change name twice within 14 days."
+    pass
+class AccountError(ClientError): 
+    "raise when try change name twice within 14 days."
+    pass   
