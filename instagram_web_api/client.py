@@ -3,9 +3,12 @@ from requests import Response
 import json
 from .auth import Login
 from .upload import Upload
-from .exceptions import *
-
-class Client (Login,Upload): 
+from .comment import Comment
+from json import JSONDecodeError
+from .utils import exception_handler
+class Client (Login,
+              Upload,
+              Comment): 
     base_api_url  = "https://www.instagram.com/api/v1/"
     def __init__(self,username,password,settings=None,proxies=None,user_agent = None,selenium_bypass=None) : 
         self.username  = username 
@@ -35,10 +38,15 @@ class Client (Login,Upload):
         with open(f'{self.username}.json','w') as file :
             json.dump(self.get_cookies) 
 
-    def _handle_response(self,response : Response, response_type ) : 
+    def _handle_response(self,response : Response, response_type :str ) : 
+        print(response.text)
+        print(response.status_code)
+        if "Oops, an error occurred." in response.text : 
+            raise  UnknownError(f"{response.text} while : {response_type.split('.')[0]}")
         try : 
+            print(response.text)
             json_response : dict =  response.json()
-        except Exception as e : 
+        except JSONDecodeError as e : 
             raise UnknownError(f"Error {str(e)} in {response_type} ")
         
         if response.status_code == 200 : 
@@ -49,18 +57,8 @@ class Client (Login,Upload):
         
         message = json_response.get("message")
         if message : 
-            if  "Media type invalid" in message : 
-                raise MediaType(message="Media type invalid")
-            elif "Sorry, your password was incorrect. Please double-check your password." == message : 
-                raise IncorrectUsername("You entred incorrect username.")
-            elif "checkpoint_required" in message  : 
-                raise CheckpointRequired("You need to login manualy or activate selenium_bypass.")
-            elif "login_required" in message : 
-                raise LoginRequired("You need to login manualy or activate selenium_bypass.")
-            elif "challenge_required" in message : 
-                raise ChallengeRequired("You need to resolve challenge or activate selenium_bypass.")
-            elif "Transcode not finished yet." in message : 
-                raise UploadMedia(str(message))
+            exception_handler(message=message)
+
 
     def _make_call(self,url=None,endpoint=None,params=None,data=None,response_type=None) :
         if endpoint : 
