@@ -75,11 +75,14 @@ class Client (Login,
             url = self.base_api_url+endpoint
         
         if data or endpoint : 
-            response =  self.session.post(url,
-                                     data=data,
-                                     allow_redirects=True)
-            return self._handle_response(response=response,
-                                         response_type=response_type)
+            try :
+                response =  self.session.post(url,
+                                        data=data,
+                                        allow_redirects=True)
+                return self._handle_response(response=response,
+                                            response_type=response_type)
+            except Exception as e : 
+                raise UnknownError(str(e))
 
 
 
