@@ -5,15 +5,19 @@ from .auth import Login
 from .upload import Upload
 from .comment import Comment
 from .interaction import Interaction
+from .account import Account
 from json import JSONDecodeError
 from .exceptions import UnknownError,BadPassword,DeletedMedia
 from .utils import exception_handler
+
 class Client (Login,
               Upload,
               Comment,
-              Interaction
+              Interaction,
+              Account
               ): 
     base_api_url  = "https://www.instagram.com/api/v1/"
+
     def __init__(self,username,password,settings=None,proxies=None,user_agent = None,selenium_bypass=None) : 
         self.username  = username 
         self.password  = password
@@ -55,7 +59,7 @@ class Client (Login,
             else :
                 raise UnknownError(str(e))
 
-         if response.status_code == 200 : 
+        if response.status_code == 200 : 
             if response_type == "auth.login" : 
                 if json_response.get('authenticated') == False :
                     raise BadPassword("You entred incorrect password.")
@@ -63,7 +67,7 @@ class Client (Login,
         
         message = json_response.get("message")
         if message : 
-            exception_handler(message=message)
+            exception_handler(message=str(json_response))
 
 
     def _make_call(self,url=None,endpoint=None,params=None,data=None,response_type=None) :
