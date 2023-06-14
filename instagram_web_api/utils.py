@@ -23,8 +23,3 @@ def is_valid_phone_number(phone_number) :
             raise AccountError("Looks like your phone number may be incorrect. Please try entering your full number, including the country code.")
     except Exception as e : 
         raise AccountError(str(e))
-
-
-
-
-    

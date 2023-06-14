@@ -1,7 +1,8 @@
 from .utils import generate_csrf_token,get_id
+
 class Login(object) : 
+
     def login(self) : 
-        time = int(datetime.now().timestamp())
         if self.logged_in : 
             return
         data = {
@@ -12,10 +13,17 @@ class Login(object) :
             'trustedDeviceRecords': '{}',          
             }
         self.session.headers ['x-csrftoken'] = generate_csrf_token()
-        response = self._make_call(endpoint="web/accounts/login/ajax/",data=data) 
-        response = self._handle_response(response,response_type="auth.login")
-        return response
+        return self._make_call(endpoint="web/accounts/login/ajax/",data=data,response_type="auth.login") 
     
+    def get_suspicious_logins(self) : 
+        self.session.headers ['x-csrftoken'] = self.get_cookies["csrftoken"]
+        self.session.headers ["Content-Type"] = "application/x-www-form-urlencoded"
+        self.session.headers ["Referer"]      = "https://www.instagram.com/"  
+        device_id = self.device_id
+        params = {"device_id" : device_id} 
+        return self._make_call(endpoint="session/login_activity/",params=params,response_type="auth.login")['suspicious_logins']
+
+
         
 
         

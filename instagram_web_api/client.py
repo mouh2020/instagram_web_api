@@ -21,6 +21,7 @@ class Client (Login,
     def __init__(self,username,password,settings=None,proxies=None,user_agent = None,selenium_bypass=None) : 
         self.username  = username 
         self.password  = password
+        self.settings  = settings
         self.logged_in = False
         self.base_headers = {
                             "user-agent" : "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Safari/537.36",
@@ -30,10 +31,9 @@ class Client (Login,
         self.session.headers = self.base_headers
         self.session.verify  = True
         self.selenium_bypass = selenium_bypass
-        if settings :
+        if self.settings :
             self.logged_in = True
-            self.session = requests.Session()
-            self.session.cookies.update(settings)
+            self.session.cookies.update(self.settings)
     
     @property
     def get_cookies(self) : 
@@ -42,11 +42,17 @@ class Client (Login,
             cookies[cookie[0]] = cookie[1]
         return cookies
     
+    @property
+    def device_id(self) : 
+        return self.settings.get('ig_did')
+    
     def dump_cookies(self) : 
         with open(f'{self.username}.json','w') as file :
             json.dump(self.get_cookies) 
 
     def _handle_response(self,response : Response, response_type :str ) : 
+        print(response.text)
+        print(response.status_code)
         try : 
             json_response : dict =  response.json()
         except JSONDecodeError as e : 
@@ -72,15 +78,21 @@ class Client (Login,
         if endpoint : 
             url = self.base_api_url+endpoint
         
-        if data or endpoint : 
-            try :
-                response =  self.session.post(url,
-                                        data=data,
+        if params : 
+            response = self.session.get(url,
+                                        params=params,
                                         allow_redirects=True)
-                return self._handle_response(response=response,
-                                            response_type=response_type)
-            except Exception as e : 
-                raise UnknownError(str(e))
+            return self._handle_response(response=response,
+                                         response_type=response_type)
+
+        elif data or endpoint : 
+            response =  self.session.post(url,
+                                    data=data,
+                                    allow_redirects=True)
+            return self._handle_response(response=response,
+                                        response_type=response_type)
+        
+ 
 
 
 
