@@ -8,7 +8,7 @@ from .interaction import Interaction
 from .account import Account
 from json import JSONDecodeError
 from .exceptions import UnknownError,BadPassword,DeletedMedia
-from .utils import exception_handler
+from .exceptions import exception_handler
 
 class Client (Login,
               Upload,
@@ -47,8 +47,6 @@ class Client (Login,
             json.dump(self.get_cookies) 
 
     def _handle_response(self,response : Response, response_type :str ) : 
-        print(response.status_code)
-        print(response.text)
         try : 
             json_response : dict =  response.json()
         except JSONDecodeError as e : 
