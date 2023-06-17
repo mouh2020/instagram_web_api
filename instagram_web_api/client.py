@@ -16,7 +16,7 @@ class Client (Login,
               Interaction,
               Account
               ): 
-    base_api_url  = "https://www.instagram.com/api/v1/web/"
+    base_api_url  = "https://www.instagram.com/api/v1/"
 
     def __init__(self,username,password,settings=None,proxies=None,user_agent = None,selenium_bypass=None) : 
         self.username  = username 
@@ -103,10 +103,3 @@ class Client (Login,
                                     data=data)
             return self._handle_response(response=response,
                                         response_type=response_type)
-        
- 
-
-
-
-
-

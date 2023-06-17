@@ -5,6 +5,6 @@ class Comment :
         data = {
             "comment_text" : comment
         }
-        return self._make_call(endpoint = f"comments/{media_id}/add/",
+        return self._make_call(endpoint = f"web/comments/{media_id}/add/",
                                data=data,
                                response_type= "comment.comment_to_media")

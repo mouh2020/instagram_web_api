@@ -13,7 +13,7 @@ class Login(object) :
             'trustedDeviceRecords': '{}',          
             }
         self.session.headers ['x-csrftoken'] = generate_csrf_token()
-        response = self._make_call(endpoint="accounts/login/ajax/",data=data,response_type="auth.login") 
+        response = self._make_call(endpoint="web/accounts/login/ajax/",data=data,response_type="auth.login") 
         self.get_cookies 
         return response
     
@@ -29,9 +29,7 @@ class Login(object) :
         }
         for suspicious_login in suspicious_logins :
             data = {"login_id"  : suspicious_login["id"] }
-            print(suspicious_login["id"])
             response = self._make_call(endpoint="web/session/login_activity/avow_login/",data=data,response_type="auth.trust_suspicious_logins")
-            return response
 
                                                    
 
