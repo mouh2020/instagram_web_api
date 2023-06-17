@@ -23,6 +23,7 @@ class Client (Login,
         self.password  = password
         self.settings  = settings
         self.logged_in = False
+        self.attempts  = 0
         self.base_headers = {
                             "user-agent" : "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Safari/537.36",
                             "x-ig-app-id": "936619743392459"
@@ -40,11 +41,22 @@ class Client (Login,
         cookies = {}
         for cookie  in self.session.cookies.items() : 
             cookies[cookie[0]] = cookie[1]
+        self.settings = cookies
         return cookies
     
     @property
     def device_id(self) : 
-        return self.settings.get('ig_did')
+        if self.settings :
+            return self.settings.get('ig_did')
+    @property
+    def csrf_token(self) :
+        if self.settings :
+            return self.settings.get('csrftoken')
+    
+    @property
+    def user_agent(self) : 
+        if self.settings :
+            return self.settings.get("user-agent")
     
     def dump_cookies(self) : 
         with open(f'{self.username}.json','w') as file :
@@ -52,7 +64,6 @@ class Client (Login,
 
     def _handle_response(self,response : Response, response_type :str ) : 
         print(response.text)
-        print(response.status_code)
         try : 
             json_response : dict =  response.json()
         except JSONDecodeError as e : 
@@ -60,13 +71,18 @@ class Client (Login,
                 raise  UnknownError(f"{response.text} while : {response_type.split('.')[0]}") 
             elif "Sorry, this photo has been deleted" in  response.text:
                  raise DeletedMedia(response.text)
-            else :
-                raise UnknownError(str(e))
+            elif "<!DOCTYPE" in response.text and response_type == "trust_suspicious_logins.login" : 
+                return True
+            elif "<!DOCTYPE" in response.text : 
+                raise UnknownError("Maybe you must login again.")
+            return 
 
         if response.status_code == 200 : 
             if response_type == "auth.login" : 
                 if json_response.get('authenticated') == False :
                     raise BadPassword("You entred incorrect password.")
+            elif response_type == "auth.trust_suspicious_logins" : 
+                return True
             return json_response
         
         message = json_response.get("message")
@@ -80,8 +96,7 @@ class Client (Login,
         
         if params : 
             response = self.session.get(url,
-                                        params=params,
-                                        allow_redirects=True)
+                                        params=params)
             return self._handle_response(response=response,
                                          response_type=response_type)
 

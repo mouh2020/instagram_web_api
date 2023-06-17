@@ -65,3 +65,5 @@ def exception_handler(message) :
         raise AccountError('You need an email or confirmed phone number.')
     elif '"errors":[]' in message : 
         raise AccountError('Unknow error when try change account info.')
+    elif "Please wait a few minutes before you try again" in message and "require_login" in message : 
+        raise LoginRequired('You need to login again.')

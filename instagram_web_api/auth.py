@@ -1,5 +1,5 @@
 from .utils import generate_csrf_token,get_id
-
+import requests
 class Login(object) : 
 
     def login(self) : 
@@ -13,18 +13,32 @@ class Login(object) :
             'trustedDeviceRecords': '{}',          
             }
         self.session.headers ['x-csrftoken'] = generate_csrf_token()
-        return self._make_call(endpoint="web/accounts/login/ajax/",data=data,response_type="auth.login") 
+        response = self._make_call(endpoint="web/accounts/login/ajax/",data=data,response_type="auth.login") 
+        self.get_cookies
+        return response
     
     def get_suspicious_logins(self) : 
-        self.session.headers ['x-csrftoken'] = self.get_cookies["csrftoken"]
-        self.session.headers ["Content-Type"] = "application/x-www-form-urlencoded"
-        self.session.headers ["Referer"]      = "https://www.instagram.com/"  
-        device_id = self.device_id
-        params = {"device_id" : device_id} 
-        return self._make_call(endpoint="session/login_activity/",params=params,response_type="auth.login")['suspicious_logins']
-
-
+        params = {"device_id" : self.device_id} 
+        response = self._make_call(endpoint="session/login_activity/",params=params,response_type="auth.get_suspicious_logins")
+        return response['suspicious_logins'] if response else False
+    
+    def trust_suspicious_logins(self) : 
+        suspicious_logins = self.get_suspicious_logins()
+        self.session.headers = {
+            "x-csrftoken":self.csrf_token
+        }
+        for suspicious_login in suspicious_logins :
+            print(suspicious_login)
+            data = {"login_id"  : suspicious_login["id"] }
+            response = requests.post("https://www.instagram.com/api/v1/web/session/login_activity/avow_login/",
+                                     data=data,
+                                     cookies=self.session.cookies,
+                                     headers=self.session.headers)
         
+        return True
+                
+
+                                                
 
         
         

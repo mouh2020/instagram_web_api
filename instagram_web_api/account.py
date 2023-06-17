@@ -22,4 +22,4 @@ class Account(object) :
                 }         
         return self._make_call(endpoint ="web/accounts/edit/",
                                data = data,
-                               response_type ="account.edit_info")
+                               response_type ="account.edit_info")   
