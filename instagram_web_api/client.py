@@ -16,7 +16,7 @@ class Client (Login,
               Interaction,
               Account
               ): 
-    base_api_url  = "https://www.instagram.com/api/v1/"
+    base_api_url  = "https://www.instagram.com/api/v1/web/"
 
     def __init__(self,username,password,settings=None,proxies=None,user_agent = None,selenium_bypass=None) : 
         self.username  = username 
@@ -29,6 +29,7 @@ class Client (Login,
                             "x-ig-app-id": "936619743392459"
                               }
         self.session   = requests.Session()
+        self.session.proxies = {proxies}
         self.session.headers = self.base_headers
         self.session.verify  = True
         self.selenium_bypass = selenium_bypass
@@ -71,12 +72,9 @@ class Client (Login,
                 raise  UnknownError(f"{response.text} while : {response_type.split('.')[0]}") 
             elif "Sorry, this photo has been deleted" in  response.text:
                  raise DeletedMedia(response.text)
-            elif "<!DOCTYPE" in response.text and response_type == "trust_suspicious_logins.login" : 
-                return True
-            elif "<!DOCTYPE" in response.text : 
+            else  : 
                 raise UnknownError("Maybe you must login again.")
-            return 
-
+             
         if response.status_code == 200 : 
             if response_type == "auth.login" : 
                 if json_response.get('authenticated') == False :
@@ -102,8 +100,7 @@ class Client (Login,
 
         elif data or endpoint : 
             response =  self.session.post(url,
-                                    data=data,
-                                    allow_redirects=True)
+                                    data=data)
             return self._handle_response(response=response,
                                         response_type=response_type)
         

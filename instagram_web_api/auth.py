@@ -1,5 +1,5 @@
 from .utils import generate_csrf_token,get_id
-import requests
+
 class Login(object) : 
 
     def login(self) : 
@@ -13,8 +13,8 @@ class Login(object) :
             'trustedDeviceRecords': '{}',          
             }
         self.session.headers ['x-csrftoken'] = generate_csrf_token()
-        response = self._make_call(endpoint="web/accounts/login/ajax/",data=data,response_type="auth.login") 
-        self.get_cookies
+        response = self._make_call(endpoint="accounts/login/ajax/",data=data,response_type="auth.login") 
+        self.get_cookies 
         return response
     
     def get_suspicious_logins(self) : 
@@ -28,17 +28,14 @@ class Login(object) :
             "x-csrftoken":self.csrf_token
         }
         for suspicious_login in suspicious_logins :
-            print(suspicious_login)
             data = {"login_id"  : suspicious_login["id"] }
-            response = requests.post("https://www.instagram.com/api/v1/web/session/login_activity/avow_login/",
-                                     data=data,
-                                     cookies=self.session.cookies,
-                                     headers=self.session.headers)
-        
-        return True
-                
+            print(suspicious_login["id"])
+            response = self._make_call(endpoint="web/session/login_activity/avow_login/",data=data,response_type="auth.trust_suspicious_logins")
+            return response
 
-                                                
+                                                   
+
+        
 
         
         

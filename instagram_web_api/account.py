@@ -20,6 +20,6 @@ class Account(object) :
                     'external_url':None,
                     'chaining_enabled': 'on',
                 }         
-        return self._make_call(endpoint ="web/accounts/edit/",
+        return self._make_call(endpoint ="accounts/edit/",
                                data = data,
                                response_type ="account.edit_info")   
