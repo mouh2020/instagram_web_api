@@ -18,7 +18,7 @@ class Client (Login,
               ): 
     base_api_url  = "https://www.instagram.com/api/v1/"
 
-    def __init__(self,username,password,settings=None,proxies=None,user_agent = None,selenium_bypass=None) : 
+    def __init__(self,username,password,email=None,email_passowrd=None,settings=None,proxies=None,user_agent = None,selenium_bypass=None) : 
         self.username  = username 
         self.password  = password
         self.settings  = settings
@@ -29,7 +29,7 @@ class Client (Login,
                             "x-ig-app-id": "936619743392459"
                               }
         self.session   = requests.Session()
-        self.session.proxies = {proxies}
+        self.session.proxies = proxies
         self.session.headers = self.base_headers
         self.session.verify  = True
         self.selenium_bypass = selenium_bypass
@@ -61,10 +61,9 @@ class Client (Login,
     
     def dump_cookies(self) : 
         with open(f'{self.username}.json','w') as file :
-            json.dump(self.get_cookies) 
+            json.dump(self.get_cookies,file) 
 
     def _handle_response(self,response : Response, response_type :str ) : 
-        print(response.text)
         try : 
             json_response : dict =  response.json()
         except JSONDecodeError as e : 
@@ -72,8 +71,8 @@ class Client (Login,
                 raise  UnknownError(f"{response.text} while : {response_type.split('.')[0]}") 
             elif "Sorry, this photo has been deleted" in  response.text:
                  raise DeletedMedia(response.text)
-            else  : 
-                raise UnknownError("Maybe you must login again.")
+            elif response.status_code == 200 and response_type == "auth.trust_suspicious_logins"  : 
+                return True
              
         if response.status_code == 200 : 
             if response_type == "auth.login" : 
