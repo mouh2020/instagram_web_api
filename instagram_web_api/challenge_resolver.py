@@ -60,6 +60,7 @@ class ChallengeResolver:
             except JSONDecodeError as e:  
                 json_response = challenge_json(response.text)
                 if not json_response["forward"] :
+                    challenge_type,response =  self.challenge_type()
                     return True
                 self.challenge_url = "https://www.instagram.com"+json_response["forward"]
                 print(self.challenge_url)

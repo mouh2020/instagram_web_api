@@ -26,7 +26,8 @@ class Upload :
         self.session.headers ["Content-Type"] = "application/x-www-form-urlencoded"
         self.session.headers ["Referer"]      = "https://www.instagram.com/"
         time.sleep(2)
-        return self._make_call( url  = 'https://www.instagram.com/api/v1/media/configure_to_clips/' ,
+        return self._make_call( method= "POST",
+                                url  = 'https://www.instagram.com/api/v1/media/configure_to_clips/' ,
                                 data = data,
                                 response_type="upload.post_video")
         
@@ -81,7 +82,8 @@ class Upload :
                 'x-instagram-rupload-params': json.dumps(data),
                 "x-ig-app-id": "936619743392459"
                                     }  
-        self._make_call(url  = f"https://www.instagram.com/rupload_igvideo/fb_uploader_{str(upload_id)}",
+        self._make_call(method= "POST",
+                        url  = f"https://www.instagram.com/rupload_igvideo/fb_uploader_{str(upload_id)}",
                         data=open(file_path,"rb").read(),
                         response_type="upload.__build_upload_id_video")
  
@@ -111,7 +113,8 @@ class Upload :
             'video_subtitles_enabled': '0',
             'disable_oa_reuse': 'false',
         }       
-        return self._make_call(url  = 'https://www.instagram.com/api/v1/media/configure/' ,
+        return self._make_call(method= "POST",
+                               url  = 'https://www.instagram.com/api/v1/media/configure/' ,
                                data = data,
                                response_type="upload.post_picture")
         
@@ -129,7 +132,8 @@ class Upload :
             "X-Instagram-Rupload-Params": f'{{"media_type": {"2" if video else "1"}, "upload_id": {upload_id}, "upload_media_height": {h}, "upload_media_width": {w}}}',
             "x-ig-app-id": "936619743392459"
                                 }
-        return self._make_call(url  = f"https://www.instagram.com/rupload_igphoto/fb_uploader_{str(upload_id)}" ,
+        return self._make_call(method= "POST",
+                               url  = f"https://www.instagram.com/rupload_igphoto/fb_uploader_{str(upload_id)}" ,
                                data = open(media_path,"rb").read() ,
                                response_type="upload.__build_upload_id_picture")
 

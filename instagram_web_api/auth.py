@@ -2,8 +2,8 @@ from .utils import generate_csrf_token,get_id
 
 class Login(object) : 
 
-    def login(self) : 
-        if self.logged_in : 
+    def login(self,relogin=None) : 
+        if self.logged_in and relogin == None : 
             return
         data = {
             "enc_password" : f'#PWD_INSTAGRAM_BROWSER:0:{get_id()}:{self.password}' ,
@@ -12,14 +12,14 @@ class Login(object) :
             'optIntoOneTap': 'false',
             'trustedDeviceRecords': '{}',          
             }
-        self.session.headers ['x-csrftoken'] = generate_csrf_token()
+        self.session.headers ['x-csrftoken'] = self.csrf_token
         response = self._make_call(endpoint="web/accounts/login/ajax/",data=data,response_type="auth.login") 
         self.get_cookies 
         return response
     
     def get_suspicious_logins(self) : 
         params = {"device_id" : self.device_id} 
-        response = self._make_call(endpoint="session/login_activity/",params=params,response_type="auth.get_suspicious_logins")
+        response = self._make_call(method= "GET",endpoint="session/login_activity/",params=params,response_type="auth.get_suspicious_logins")
         return response['suspicious_logins'] if response else False
     
     def trust_suspicious_logins(self) : 
@@ -29,7 +29,7 @@ class Login(object) :
         }
         for suspicious_login in suspicious_logins :
             data = {"login_id"  : suspicious_login["id"] }
-            response = self._make_call(endpoint="web/session/login_activity/avow_login/",data=data,response_type="auth.trust_suspicious_logins")
+            response = self._make_call(method ="POST",endpoint="web/session/login_activity/avow_login/",data=data,response_type="auth.trust_suspicious_logins")
 
                                                    
 

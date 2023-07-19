@@ -2,7 +2,8 @@ class Interaction(object) :
 
     def like_modia(self,media_id:str,unlike=None) : 
         self.session.headers  ['x-csrftoken'] = self.get_cookies["csrftoken"]
-        return self._make_call(endpoint= f"web/likes/{media_id}/unlike/" if unlike else  f"web/likes/{media_id}/like/",
+        return self._make_call(method = "POST",
+                               endpoint= f"web/likes/{media_id}/unlike/" if unlike else  f"web/likes/{media_id}/like/",
                                response_type="interaction.unlike" if unlike else "interaction.like")
     
     def unlike_media(self,media_id:str) : 
